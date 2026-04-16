@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Laboratorio SCADA - PLC Delta SE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .slide {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+            min-height: 500px;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2a5298;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #1e3c72;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .objectives-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .objectives-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .objectives-box li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .objectives-box li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .equipment-item {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d1d9e6;
+        }
+
+        .equipment-item strong {
+            color: #2a5298;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .problem-box {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(238, 90, 36, 0.3);
+        }
+
+        .problem-box h3 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            margin-top: 0;
+        }
+
+        .requirement {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .image-placeholder {
+            background: #f8f9fa;
+            border: 3px dashed #ced4da;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 20px 0;
+            color: #6c757d;
+        }
+
+        .image-placeholder img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .image-placeholder.placeholder-only {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-row {
+            margin: 25px 0;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .tag-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .tag-table th,
+        .tag-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tag-table th {
+            background: #2a5298;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tag-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-prev {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-prev:hover {
+            background: #5a6268;
+            transform: translateX(-3px);
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #5568d3;
+            transform: translateX(3px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: #e9ecef;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+
+        .slide-counter {
+            text-align: center;
+            padding: 10px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background: #f8f9fa;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        ul.steps {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+
+        ul.steps li {
+            margin: 10px 0;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.4em;
+            background-position: 0 88%;
+            padding: 0 4px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .equipment-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .slide {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Guía de Laboratorio SCADA</h1>
+            <p>PLC Delta SE + KEPServerEX + InfileLink</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 12.5%"></div>
+        </div>
+
+        <!-- Slide 1: Objetivos -->
+        <div class="slide active" id="slide1">
+            <h2>🎯 Objetivos del Laboratorio</h2>
+            
+            <div class="objectives-box">
+                <ul>
+                    <li>Configurar la comunicación entre un PLC Delta DVP-SE y una estación PC mediante puerto virtual USB y protocolo <span class="highlight">Modbus Serial ASCII</span></li>
+                    <li>Enlazar <strong>KEPServerEX</strong> con el PLC y mapear variables de proceso para exposición vía OPC/Modbus</li>
+                    <li>Desarrollar una interfaz SCADA minimalista y funcional en <strong>InfileLink</strong> para monitoreo y control básico</li>
+                    <li>Configurar el <strong>COM2</strong> del PLC para lectura de temperatura mediante módulo <strong>DVP04TC</strong> conectado a red RS485</li>
+                    <li>Aplicar en el programa del PLC lógica con <span class="highlight">salidas retenidas, temporizadores, contadores</span> y una rutina aislada de <span class="highlight">conversión de dato entero a flotante</span></li>
+                </ul>
+            </div>
+
+            <div class="image-placeholder">
+                <img src="1.PNG" alt="Diagrama de arquitectura del sistema SCADA" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>📊</span><strong>Figura 1:</strong> Diagrama de arquitectura del sistema<br><small>Insertar imagen 1.PNG aquí</small></div>'">
+            </div>
+        </div>
+
+        <!-- Slide 2: Equipos -->
+        <div class="slide" id="slide2">
+            <h2>📦 Equipos y Software Requerido</h2>
+            
+            <div class="equipment-grid">
+                <div class="equipment-item">
+                    <strong>PLC</strong>
+                    Delta DVP-SE (con firmware compatible Modbus)
+                </div>
+                <div class="equipment-item">
+                    <strong>Cable</strong>
+                    USB a PLC (genera puerto COM virtual en Windows)
+                </div>
+                <div class="equipment-item">
+                    <strong>Módulo</strong>
+                    DVP04TC (lectura de temperatura, interfaz RS485)
+                </div>
+                <div class="equipment-item">
+                    <strong>Sensor</strong>
+                    Transmisor de temperatura compatible RS485
+                </div>
+                <div class="equipment-item">
+                    <strong>Software PLC</strong>
+                    WPLSoft / ISPSoft
+                </div>
+                <div class="equipment-item">
+                    <strong>Gateway SCADA</strong>
+                    KEPServerEX (driver Modbus Serial)
+                </div>
+                <div class="equipment-item">
+                    <strong>HMI/SCADA</strong>
+                    InfileLink
+                </div>
+                <div class="equipment-item">
+                    <strong>PC</strong>
+                    Windows 10/11, drivers USB-Serial
+                </div>
+            </div>
+
+            <div class="image-placeholder">
+                <img src="2.PNG" alt="Configuración física del laboratorio" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🔌</span><strong>Figura 2:</strong> Configuración física del laboratorio<br><small>Insertar imagen 2.PNG aquí</small></div>'">
+            </div>
+        </div>
+
+        <!-- Slide 3: Problema -->
+        <div class="slide" id="slide3">
+            <h2>🎛️ Planteamiento del Problema</h2>
+            
+            <div class="problem-box">
+                <h3>Contexto Industrial</h3>
+                <p>Sistema de dosificación y control térmico para un tanque de mezcla en una planta de procesos.</p>
+                
+                <h3 style="margin-top: 25px;">Requisitos Funcionales del Programa PLC</h3>
+                
+                <div class="requirement">
+                    <strong>1. Salidas retenidas (latch/unlatch):</strong><br>
+                    Bomba de llenado y válvula de descarga deben activarse/desactivarse mediante pulsadores START/STOP y mantener su estado hasta nueva orden o falla.
+                </div>
+                
+                <div class="requirement">
+                    <strong>2. Temporizador (TON/TOF):</strong><br>
+                    Controlar el tiempo de activación de la bomba de llenado. El temporizador debe reiniciarse automáticamente al completarse el ciclo o al presionar RESET.
+                </div>
+                
+                <div class="requirement">
+                    <strong>3. Contador ascendente:</strong><br>
+                    Contar la cantidad de ciclos de dosificación completados. Debe disponer de un conteo parcial que refleje el avance del ciclo en curso.
+                </div>
+                
+                <div class="requirement">
+                    <strong>4. Conversión entero → flotante (rutina aislada):</strong><br>
+                    Implementar una subrutina o bloque independiente que tome un valor entero y lo convierta a formato flotante IEEE-754.
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Nota importante:</strong> El estudiante deberá programar la solución en el PLC. No se proporciona código intencionalmente para fomentar el análisis funcional.
+            </div>
+
+            <div class="image-row">
+                <div class="image-placeholder">
+                    <img src="3.PNG" alt="Diagrama de flujo del proceso de dosificación" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🔄</span><strong>Figura 3:</strong> Diagrama de flujo del proceso<br><small>Insertar imagen 3.PNG aquí</small></div>'">
+                </div>
+            </div>
+
+            <div class="image-row">
+                <div class="image-placeholder">
+                    <img src="4.PNG" alt="Esquema de conexiones I/O del PLC" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🔧</span><strong>Figura 4:</strong> Esquema de conexiones I/O<br><small>Insertar imagen 4.PNG aquí</small></div>'">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Fase 1 -->
+        <div class="slide" id="slide4">
+            <span class="phase-badge">FASE 1</span>
+            <h2>Configuración USB y KEPServerEX</h2>
+            
+            <h3>1.1 Configuración del Puerto Virtual</h3>
+            <ul class="steps">
+                <li>Conectar el PLC a la PC mediante cable USB</li>
+                <li>Verificar en <strong>Administrador de dispositivos</strong> que se asigne un puerto COM virtual (ej. COM3)</li>
+            </ul>
+
+            <div class="image-placeholder">
+                <img src="5.PNG" alt="Administrador de dispositivos - Puerto COM" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>💻</span><strong>Figura 5:</strong> Verificación del puerto COM virtual<br><small>Insertar imagen 5.PNG aquí</small></div>'">
+            </div>
+
+            <h3>1.2 Configuración COM1 en el PLC</h3>
+            <ul class="steps">
+                <li>Modo: <strong>ASCII</strong></li>
+                <li>Baudrate: <strong>9600</strong></li>
+                <li>Data bits: 8, Parity: Even, Stop: 1</li>
+                <li>Dirección Modbus: <strong>1</strong></li>
+            </ul>
+
+            <h3>1.3 Configuración en KEPServerEX</h3>
+            <ul class="steps">
+                <li>Crear nuevo canal → Driver: <strong>Modbus Serial</strong> → Protocolo: <strong>ASCII</strong></li>
+                <li>Seleccionar el puerto COM virtual asignado</li>
+                <li>Configurar parámetros idénticos al PLC</li>
+                <li>Crear dispositivo con <strong>Unit ID = 1</strong></li>
+            </ul>
+
+            <div class="success-box">
+                ✅ Verificar comunicación con <strong>OPC Quick Client</strong> o <strong>KEPServerEX Test Client</strong>
+            </div>
+        </div>
+
+        <!-- Slide 5: Fase 2 -->
+        <div class="slide" id="slide5">
+            <span class="phase-badge">FASE 2</span>
+            <h2>Creación de Tags en KEPServerEX</h2>
+            
+            <p>Crear las siguientes variables bajo el dispositivo Modbus. Ajustar direcciones según la tabla de mapeo del PLC Delta:</p>
+
+            <table class="tag-table">
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Tipo</th>
+                        <th>Dirección</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>PLC.START</code></td>
+                        <td>Boolean</td>
+                        <td>00001</td>
+                        <td>Pulsador marcha</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.STOP</code></td>
+                        <td>Boolean</td>
+                        <td>00002</td>
+                        <td>Pulsador parada</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.PUMP</code></td>
+                        <td>Boolean</td>
+                        <td>00101</td>
+                        <td>Salida retenida bomba</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.TIMER_STATUS</code></td>
+                        <td>Boolean</td>
+                        <td>T0.DN</td>
+                        <td>Estado del temporizador</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.TIMER_CURRENT</code></td>
+                        <td>Integer</td>
+                        <td>T0.ACC</td>
+                        <td>Valor actual temporizador</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.COUNTER_STATUS</code></td>
+                        <td>Boolean</td>
+                        <td>C0.DN</td>
+                        <td>Estado del contador</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.COUNTER_PARTIAL</code></td>
+                        <td>Integer</td>
+                        <td>C0.ACC</td>
+                        <td>Conteo parcial</td>
+                    </tr>
+                    <tr>
+                        <td><code>PLC.FLOAT_VALUE</code></td>
+                        <td>Float</td>
+                        <td>D10-D11</td>
+                        <td>Registro 32-bit flotante</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="image-placeholder">
+                <img src="6.PNG" alt="Configuración de tags en KEPServerEX" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🏷️</span><strong>Figura 6:</strong> Configuración de tags en KEPServerEX<br><small>Insertar imagen 6.PNG aquí</small></div>'">
+            </div>
+        </div>
+
+        <!-- Slide 6: Fase 3 -->
+        <div class="slide" id="slide6">
+            <span class="phase-badge">FASE 3</span>
+            <h2>Diseño de Pantalla SCADA en InfileLink</h2>
+            
+            <h3>Requisitos de la Interfaz</h3>
+            <ul class="steps">
+                <li>Crear nuevo proyecto → Conectar a KEPServerEX vía <strong>OPC</strong> (DA o UA)</li>
+                <li>Diseñar una pantalla <strong>minimalista y funcional</strong> con:</li>
+            </ul>
+
+            <div class="objectives-box">
+                <ul>
+                    <li>Botones <strong>START</strong>, <strong>STOP</strong>, <strong>RESET</strong> (enlazar a tags booleanos)</li>
+                    <li>Indicadores de estado para <strong>PUMP</strong>, <strong>VALVE</strong>, <strong>TIMER_STATUS</strong>, <strong>COUNTER_STATUS</strong></li>
+                    <li>Displays numéricos para <strong>TIMER_CURRENT</strong>, <strong>COUNTER_PARTIAL</strong>, <strong>COUNTER_TOTAL</strong></li>
+                    <li>Display para <strong>FLOAT_VALUE</strong> (formato %.2f)</li>
+                    <li>Etiquetas claras, sin elementos decorativos innecesarios</li>
+                </ul>
+            </div>
+
+            <h3>Configuración de Actualización</h3>
+            <ul class="steps">
+                <li><strong>Polling:</strong> 500ms</li>
+                <li><strong>Deadband:</strong> 0 (para depuración)</li>
+            </ul>
+
+            <div class="image-placeholder">
+                <img src="7.PNG" alt="Pantalla SCADA en InfileLink" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🖥️</span><strong>Figura 7:</strong> Pantalla SCADA minimalista en InfileLink<br><small>Insertar imagen 7.PNG aquí</small></div>'">
+            </div>
+	    <a href="https://www.youtube.com/watch?v=phEtyQRdugA">Video ejemplo manejo de objetos infilink</a>
+
+        </div>
+
+        <!-- Slide 7: Fase 4 -->
+        <div class="slide" id="slide7">
+            <span class="phase-badge">FASE 4</span>
+            <h2>Configuración COM2 - Módulo DVP04TC</h2>
+            
+            <h3>Conexión Física RS485</h3>
+            <ul class="steps">
+                <li>Conectar el módulo <strong>DVP04TC</strong> al bus RS485 del <strong>COM2</strong> del PLC</li>
+                <li>Verificar polaridad <strong>D+ / D-</strong></li>
+                <li>Terminación de <strong>120Ω</strong> si es red extendida</li>
+            </ul>
+
+            <div class="image-placeholder">
+                <img src="8.PNG" alt="Conexión RS485 del módulo DVP04TC" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🔧</span><strong>Figura 8:</strong> Conexión física RS485<br><small>Insertar imagen 8.PNG aquí</small></div>'">
+            </div>
+
+            <h3>Configuración del COM2 en el PLC</h3>
+            <ul class="steps">
+                <li>Protocolo: <strong>Modbus RTU o ASCII</strong> (según especificación del DVP04TC)</li>
+                <li>Baudrate: 9600/19200</li>
+                <li>Paridad: Even/None, Bits: 8, Stop: 1</li>
+                <li>Dirección del transmisor: <strong>2</strong></li>
+                <li>Asignar registros internos (ej. <strong>D20-D23</strong> por canal)</li>
+            </ul>
+
+            <h3>Configuración en KEPServerEX</h3>
+            <ul class="steps">
+                <li>Agregar nuevo dispositivo bajo el mismo canal o canal separado</li>
+                <li><strong>Unit ID = 2</strong></li>
+                <li>Mapear registros de temperatura (40001-40004 como Float32 o Int16)</li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Fase 5 y Programa -->
+        <div class="slide" id="slide8">
+            <span class="phase-badge">FASE 5</span>
+            <h2>Integración de Temperatura y Programa PLC</h2>
+            
+            <h3>Tags de Temperatura en KEPServerEX</h3>
+            <ul class="steps">
+                <li><code>TEMP.CH1</code>, <code>TEMP.CH2</code>, <code>TEMP.CH3</code>, <code>TEMP.CH4</code> (tipo Float)</li>
+                <li><code>TEMP.MODULE_STATUS</code> (Boolean o Word de diagnóstico)</li>
+            </ul>
+
+            <h3>Actualización de InfileLink</h3>
+            <ul class="steps">
+                <li>Agregar displays numéricos para cada canal de temperatura</li>
+                <li>Incluir indicador de estado del módulo</li>
+                <li>Mantener diseño minimalista: agrupar en panel <strong>TEMPERATURA</strong></li>
+                <li>Configurar escalado si el transmisor entrega entero (ej. 0.1°C por bit)</li>
+            </ul>
+
+            <div class="image-placeholder">
+                <img src="9.PNG" alt="Lectura de temperatura en tiempo real" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'placeholder-only\'><span style=\'font-size: 3em; margin-bottom: 10px;\'>🌡️</span><strong>Figura 9:</strong> Visualización de temperatura en SCADA<br><small>Insertar imagen 9.PNG aquí</small></div>'">
+            </div>
+
+            <h3 style="margin-top: 30px;">📝 Programa del PLC</h3>
+            <div class="warning-box">
+                <strong>Para el programa:</strong><br>
+                El estudiante debe desarrollar el programa en ISPSoft incluyendo:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Lógica de salidas retenidas</li>
+                    <li>Temporizadores TON/TOF</li>
+                    <li>Contadores ascendentes</li>
+                    <li>Rutina aislada de conversión entero→flotante</li>
+                </ul>
+            </div>
+
+            
+        </div>
+
+        <!-- Slide 9: Evaluación -->
+        <div class="slide" id="slide9">
+            <h2>📊 Entregables y Evaluación</h2>
+            
+            <table class="tag-table">
+                <thead>
+                    <tr>
+                        <th>Criterio</th>
+                        <th>Peso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Configuración correcta de COM1/USB y Modbus ASCII en KEPServerEX</td>
+                        <td><strong>15%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Tags creados y funcionales (I/O discretas, timer, counter, float, temp)</td>
+                        <td><strong>20%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Programa PLC con retenidas, temporizador, contador y conversión E→F aislada</td>
+                        <td><strong>25%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Pantalla InfileLink minimalista, funcional y con todos los tags enlazados</td>
+                        <td><strong>20%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Configuración COM2 + DVP04TC + RS485 y actualización de pantalla SCADA</td>
+                        <td><strong>20%</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📦 Entregables</h3>
+            <ul class="steps">
+                <li>Proyecto PLC (.wpl o .isp)</li>
+                <li>Archivo KEPServerEX exportado</li>
+                <li>Proyecto InfileLink</li>
+                <li>Reporte con capturas de pantalla de comunicación y funcionamiento en tiempo real</li>
+            </ul>
+
+            <div class="success-box" style="margin-top: 25px;">
+                <strong>✅ Validación final:</strong> Verificar que todas las variables se actualicen en tiempo real y que la conversión entero→flotante funcione correctamente.
+            </div>
+        </div>
+
+        <div class="slide-counter" id="slideCounter">
+            Diapositiva 1 de 9
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-prev" id="prevBtn" onclick="changeSlide(-1)" disabled>← Anterior</button>
+            <button class="btn btn-next" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 9;
+
+        function changeSlide(direction) {
+            // Ocultar slide actual
+            document.getElementById(`slide${currentSlide}`).classList.remove('active');
+            
+            // Calcular nuevo slide
+            currentSlide += direction;
+            
+            // Validar límites
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) currentSlide = totalSlides;
+            
+            // Mostrar nuevo slide
+            document.getElementById(`slide${currentSlide}`).classList.add('active');
+            
+            // Actualizar botones
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            
+            // Actualizar contador
+            document.getElementById('slideCounter').textContent = 
+                `Diapositiva ${currentSlide} de ${totalSlides}`;
+            
+            // Actualizar barra de progreso
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < totalSlides) changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 1) changeSlide(-1);
+            }
+        });
+    </script>
+</body>
+</html>
